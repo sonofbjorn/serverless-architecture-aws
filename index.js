@@ -1,7 +1,7 @@
 "use strict"
 
 const AWS = require("aws-sdk")
-const elasticTranscoder = new AWS.elasticTranscoder({
+const elasticTranscoder = new AWS.ElasticTranscoder({
   region: "us-east-1"
 })
 
@@ -13,7 +13,7 @@ exports.handler = (event, context, callback) => {
   console.log("key: ", key, sourceKey, outputKey)
 
   const params = {
-    PipelineId: "",
+    PipelineId: "1497385863272-t1gov7",
     OutputKeyPrefix: outputKey + "/",
     Input: {
       Key: sourceKey
