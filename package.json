@@ -10,5 +10,8 @@
     "aws-sdk": "latest"
   },
   "author": "Leif Bjornson",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "run-local-lambda": "^1.1.1"
+  }
 }
