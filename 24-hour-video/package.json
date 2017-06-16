@@ -1,9 +1,13 @@
 {
   "name": "24-hour-video",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "24 Hour Video Website",
+  "local-web-server": {
+    "port": 8100,
+    "forbid": "*.json"
+  },
   "scripts": {
+    "start": "ws",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
