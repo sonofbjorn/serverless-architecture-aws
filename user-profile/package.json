@@ -1,0 +1,20 @@
+{
+  "name": "user-profile",
+  "version": "1.0.0",
+  "description": "Validate JWT and retrieve user info",
+  "main": "index.js",
+  "scripts": {
+    "test": "run-local-lambda --file index.js --event tests/event.json",
+    "deploy": "aws lambda update-function-code --function-name arn:aws:lambda:us-east-1:422203671067:function:user-profile --zip-file fileb://Lambda-Deployment.zip",
+    "predeploy": "zip -r Lambda-Deployment.zip * -x *.zip *.json *.log .gitignore *.md"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^7.4.1",
+    "request": "^2.81.0"
+  },
+  "author": "Leif Bjornson",
+  "license": "ISC",
+  "devDependencies": {
+    "run-local-lambda": "^1.1.1"
+  }
+}
