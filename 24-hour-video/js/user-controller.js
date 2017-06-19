@@ -40,14 +40,20 @@ var userController = {
     this.wireEvents()
   },
   configureAuthenticatedRequests: function() {
+    var that = this
     $.ajaxSetup({
-      beforeSend: function(xhr) {
-        xhr.setRequestHeader(
-          "Authorization",
-          "Bearer " + localStorage.getItem("userToken")
-        )
+      beforeSend: function(xhr, settings) {
+        if (that.isApiGatewayCall(settings.url)) {
+          xhr.setRequestHeader(
+            "Authorization",
+            "Bearer " + localStorage.getItem("userToken")
+          )
+        }
       }
     })
+  },
+  isApiGatewayCall: function(requestUrl) {
+    return requestUrl.indexOf(this.data.config.apiBaseUrl) !== -1
   },
   showUserAuthenticationDetails: function(profile) {
     var showAuthenticationElements = !!profile
