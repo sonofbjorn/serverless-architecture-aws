@@ -99,4 +99,85 @@ Filter and pattern syntax: http://amzn.to/1miUFTd
 * Cognito is fine but has some deficiencies.
 * Auth0 can be labeled a universal identity platform
   * AWS integration in Auth0: https://auth0.com/docs/integrations/aws
-* 
+
+## Chapter 6: Lambda the orchestrator
+* Two ways to invoke a lambda:
+  * event - e.g. S3 create object event
+  * Request-Response - e.g. API Gateway or AWS console. Lambda executes synchronously and returns response to the caller
+
+### Event invocation
+* Two event models:
+  * Push: e.g. S3 - the event is pushed to Lambda
+  * Pull: e.g. DynamoDB, Kinesis stream - Lambda polls for changes in streaming event source and invokes Lambda when needed
+* Event source mapping: describes relationship betw and event and a lambda
+  * For push mappings, source mappings are maintained w/i **event source**. Event source needs appropriate policy to invoke lambda.
+  * For pull mapping, source mappings are maintained w/i **AWS Lambda**. Lambda needs appropriate policy in order to poll the stream and read records.
+  * For stream-based event source, function invocation concurrency is eq to the number of active shards.
+  * For non-stream event source, function invocation concurrency is defined by the equation: `events (or requests) per second * function duration`
+* If a Lambda is throttled and continues to be invoked synchronously, Lambda responds with 429 error. Event source is then responsible for invoking function again.
+* When invoked asynchronously, AWS will auto-retry the throttled event for up to six hrs with delays in between each invocation
+
+### Container reuse
+* Cannot depend on reuse. It's Lambda's prerogative to create a new one instead.
+* If /tmp folder is used during Lambda execution, it's probably wise to clear out the folder before running subsequent Lambdas. /tmp data will persist when container is reused.
+* Freeze/thaw cycle: Run a function and launch background thread or process. When func finishes executing, the background process becomes frozen. If/when container is reused, bg process will continue running as if nothing happened.
+
+### Cold and warm Lambda
+* cold starts lead to longer running functions
+* Steps to improve perf related to cold starts:
+  * Schedule the func to run periodically to keep it warm
+  * Move initialization and setup code out of event handler. No need to run this code if container is warm.
+  * Increase memory allocated to the function. Note that CPU allocation is proportional to amt of memory.
+  * Remove as much code as possible, particularly unnecessary modules and import statements
+
+### Programming Model
+
+#### Function handler
+Method signature:
+```js
+  exports.handler = function (event, context, callback) { // code }
+```
+* Event object
+  * Event payload varies based on the event source
+  * Can see sample event objects in Lambda console by going to Actions > Configure Test Event
+* Context object
+  * Provides info about Lambda's runtime
+  * Methods and properties of context object described here: http://amzn.to/1UK9eib
+* Callback function
+  * Optional 3rd param
+  * Used to return info to the caller in RequestResponse invocation type
+  * Method signature: `callback(error, result)`
+  * More info regarding use of the callback param: http://amzn.to/1NeqXM5
+
+#### Logging
+* Logging to CloudWatch is accomplished by using `console.log("message")`
+* Can also log with `console.error()`, `console.warn()`, `console.info()`, but no difference in logs
+* Callback will also log to CloudWatch if non-null first param is passed
+* Book author recommends using a proper logging framework that will manage alert levels and log objects (e.g. https://www.npmjs.com/package/log)
+* Good read on logging: https://blog.risingstack.com/node-js-logging-tutorial/
+* Node logging frameworks: https://www.loggly.com/blog/three-node-js-libraries-which-make-sophisticated-logging-simpler/
+* Bunyan looks like good option for logging, as it logs process id (pid), hostname, and timestamp by default
+
+### Versioning, Aliases, and Env Vars
+
+#### Versioning
+* when new version of func is published, old versions can be accessed, but cannot be changed
+* each version of func has unique arn
+
+#### Aliases
+* shortcut / pointer to Lambda function. has an arn just like a function and can be to function or version
+* Use case for aliases:
+  * have three different environments: dev, staging, prod
+  * don't want to update event sources to point to new arn every time function changes
+  * rather than configuring event sources to point to function arn, point them to alias arn. this way only have to change func that the alias points to as new versions of functions are promoted to higher environments.
+
+#### Environment variables
+* Can be encrypted
+* Can be specified per version (helpful for handling different env vars by environment)
+
+###  Lambda Patterns
+* Solutions to callback hell...
+  * Async waterfall (http://bit.ly/23RfWVe)
+  * Promises, generators, yields
+  * async/await (ES7 --- requires Babel transpilation)
+
