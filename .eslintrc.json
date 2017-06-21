@@ -13,6 +13,7 @@
     },
     "rules": {
         "no-const-assign": "warn",
+        "no-debugger": "warn",
         "no-this-before-super": "warn",
         "no-undef": "warn",
         "no-unreachable": "warn",
