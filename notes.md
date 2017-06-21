@@ -181,3 +181,9 @@ Method signature:
   * Promises, generators, yields
   * async/await (ES7 --- requires Babel transpilation)
 
+### Testing Lambda
+* Install sinon-chai node module for nicer assertion syntax with `should`
+* `mocha -w --inspect --debug-brk`
+* Add debugger statement to file you want to debug
+* Added `"no-debugger": "warn"` .eslintrc
+* Good tips on Node.js debugging
