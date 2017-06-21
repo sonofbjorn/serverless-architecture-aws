@@ -16,6 +16,10 @@
   "author": "Leif Bjornson",
   "license": "ISC",
   "devDependencies": {
-    "run-local-lambda": "^1.1.1"
+    "chai": "^4.0.2",
+    "rewire": "^2.5.2",
+    "run-local-lambda": "^1.1.1",
+    "sinon": "^2.3.5",
+    "sinon-chai": "^2.11.0"
   }
 }
