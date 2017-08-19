@@ -182,8 +182,33 @@ Method signature:
   * async/await (ES7 --- requires Babel transpilation)
 
 ### Testing Lambda
+
+#### Unit testing 
 * Install sinon-chai node module for nicer assertion syntax with `should`
-* `mocha -w --inspect --debug-brk`
+* `mocha -w --inspect-brk`
 * Add debugger statement to file you want to debug
 * Added `"no-debugger": "warn"` .eslintrc
 * Good tips on Node.js debugging
+* Example of Lambda with tests referenced by the book: https://gist.github.com/ifraixedes/3330ce0edf9286234b04
+
+#### Testing in AWS
+* Can use unit and load test harness blueprint in AWS to test - invokes Lambda under test and writes to a DynamoDB table
+
+## API Gateway
+* Always use alias when pointing to a Lambda from API Gateway
+* Any time a change is made in API Gate, must redeploy
+
+### Lambda Proxy Integration
+  * in this mode, API Gateway maps every request to JSOn and passes it to Lambda as the event object
+  * Alternative is to create a mapping template in the Integration Request section of the API Gateway and define how to map HTTP request to JSON
+  * Lambda Proxy Integration is generally preferred, but there may be times where the succinct payload offered by manually mapping makes more sense.
+
+### CORS security
+* If use Lambda Proxy, then CORS settings must be configured in response create by the Lambda function
+* If use Integration Request mapping, then CORS settings can be set in the integration response of the the method
+
+### Method Execution Detail screen
+1. Method Request defines the public interface (header and body) for the combination of resource and method (incl custom authorization filter)
+2. Integration Request defines the back end integration (e.g. which Lambda to invoke). This is also where request mapping can be defined
+3. Integration Response defines how data is mapped into a format expect by the caller of the API (nothing to configure in the case of Lamda Proxy)
+4. Method Response defines the public interface that includes headers and body of the response. Nothing required since we're using Lambda proxy
